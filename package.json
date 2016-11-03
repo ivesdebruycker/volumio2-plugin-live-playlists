@@ -1,0 +1,21 @@
+{
+  "name": "random_playlist",
+  "version": "1.0.0",
+  "description": "Random playlist",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "volumio_info": {
+    "prettyName": "Random playlist",
+    "icon": "fa-list-ol",
+    "plugin_type": "music_service",
+    "boot_priority": 10
+  },
+  "dependencies": {
+    "kew": "^0.7.0",
+    "mpd": "^1.3.0"
+  },
+  "author": "Ives De Bruycker",
+  "license": "ISC"
+}
