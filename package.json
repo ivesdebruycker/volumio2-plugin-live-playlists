@@ -1,13 +1,13 @@
 {
-  "name": "random_playlist",
+  "name": "live_playlists",
   "version": "1.0.0",
-  "description": "Random playlist",
+  "description": "Live playlists",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "volumio_info": {
-    "prettyName": "Random playlist",
+    "prettyName": "Live playlists",
     "icon": "fa-list-ol",
     "plugin_type": "music_service",
     "boot_priority": 10
