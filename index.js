@@ -18,8 +18,10 @@ function live_playlists(context) {
 }
 
 live_playlists.prototype.onVolumioStart = function () {
-    var self = this;
-    //Perform startup tasks here
+    var configFile = this.commandRouter.pluginManager.getConfigurationFile(this.context, 'config.json');
+
+    this.config = new (require('v-conf'))();
+    this.config.loadFile(configFile);
 
     return libQ.resolve();
 };
@@ -65,34 +67,51 @@ live_playlists.prototype.handleBrowseUri = function (curUri) {
         });*/
 
         if(curUri == 'live_playlists') {
-            list.push({
-                type: 'playlist',
-                title: '10 random tracks',
-                service:'live_playlists',
-                icon: 'fa fa-list-ol',
-                uri: 'live_playlists_random_10'
-            });
-            list.push({
-                type: 'playlist',
-                title: '100 random tracks',
-                service:'live_playlists',
-                icon: 'fa fa-list-ol',
-                uri: 'live_playlists_random_100'
-            });
-            list.push({
-                type: 'playlist',
-                title: '500 random tracks',
-                service:'live_playlists',
-                icon: 'fa fa-list-ol',
-                uri: 'live_playlists_500'
-            });
-            list.push({
-                type: 'playlist',
-                title: 'Latest tracks',
-                service:'live_playlists',
-                icon: 'fa fa-list-ol',
-                uri: 'live_playlists_latest'
-            });
+            if (self.config.get('random_10')) {
+                list.push({
+                    type: 'playlist',
+                    title: '10 random tracks',
+                    service:'live_playlists',
+                    icon: 'fa fa-list-ol',
+                    uri: 'live_playlists_random_10'
+                });
+            }
+            if (self.config.get('random_50')) {
+                list.push({
+                    type: 'playlist',
+                    title: '50 random tracks',
+                    service:'live_playlists',
+                    icon: 'fa fa-list-ol',
+                    uri: 'live_playlists_random_50'
+                });
+            }
+            if (self.config.get('random_100')) {
+                list.push({
+                    type: 'playlist',
+                    title: '100 random tracks',
+                    service:'live_playlists',
+                    icon: 'fa fa-list-ol',
+                    uri: 'live_playlists_random_100'
+                });
+            }
+            if (self.config.get('random_500')) {
+                list.push({
+                    type: 'playlist',
+                    title: '500 random tracks',
+                    service:'live_playlists',
+                    icon: 'fa fa-list-ol',
+                    uri: 'live_playlists_random_500'
+                });
+            }
+            if (self.config.get('latest')) {
+                list.push({
+                    type: 'playlist',
+                    title: 'Latest tracks',
+                    service:'live_playlists',
+                    icon: 'fa fa-list-ol',
+                    uri: 'live_playlists_latest'
+                });
+            }
             list.push({
                 type: 'playlist',
                 title: 'Tracks from 2015',
@@ -182,9 +201,10 @@ live_playlists.prototype.getRandom = function(count) {
     var self = this;
     var defer = libQ.defer();
     count = count || 10;
+    var filter_path = self.config.get('filter_path');
 
     self.controllerMpd.mpdReady.then(function () {
-        self.controllerMpd.clientMpd.sendCommand(libMpd.cmd('listall', ["NAS/Singles"]), function (err, msg) {
+        self.controllerMpd.clientMpd.sendCommand(libMpd.cmd('listall', [filter_path]), function (err, msg) {
             var items = [];
             if (msg) {
                 var lines = msg.split('\n');
@@ -211,11 +231,21 @@ live_playlists.prototype.getRandom = function(count) {
 };
 
 live_playlists.prototype.findLastAdded = function() {
-    return this.executeFind('modified-since "2016-06-01T00:00:00Z" base "NAS/Singles"');
+    var filter_path = '';
+    if (this.config.get('filter_path')) {
+        filter_path = 'base "' + this.config.get('filter_path') + '"';
+    }
+
+    return this.executeFind('modified-since "2016-06-01T00:00:00Z" ' + filter_path);
 };
 
 live_playlists.prototype.findByYear = function(year) {
-    return this.executeFind('Date "' + parseInt(year, 10) + '" base "NAS/Singles"');
+    var filter_path = '';
+    if (this.config.get('filter_path')) {
+        filter_path = 'base "' + this.config.get('filter_path') + '"';
+    }
+
+    return this.executeFind('Date "' + parseInt(year, 10) + '" ' + filter_path);
 };
 
 live_playlists.prototype.findByYearRange = function(yearStart, yearEnd) {
@@ -229,7 +259,6 @@ live_playlists.prototype.findByYearRange = function(yearStart, yearEnd) {
     }
 
     libQ.all(promises).then(function (itemsArr) {
-        console.log('all resolved', itemsArr.length);
         for(var k = 0; k < itemsArr.length; k++){
             itemsFinal = itemsFinal.concat(itemsArr[k]);
         }
@@ -350,10 +379,32 @@ live_playlists.prototype.onUninstall = function () {
     //Perform your deinstallation tasks here
 };
 
-live_playlists.prototype.getUIConfig = function () {
+live_playlists.prototype.getUIConfig = function() {
+    var defer = libQ.defer();
     var self = this;
 
-    //return {success: true, plugin: "live_playlists"};
+    var lang_code = this.commandRouter.sharedVars.get('language_code');
+
+    self.commandRouter.i18nJson(__dirname+'/i18n/strings_'+lang_code+'.json',
+        __dirname+'/i18n/strings_en.json',
+        __dirname + '/UIConfig.json')
+        .then(function(uiconf)
+        {
+            uiconf.sections[0].content[0].value = self.config.get('filter_path');
+            uiconf.sections[0].content[1].value = self.config.get('random_10');
+            uiconf.sections[0].content[2].value = self.config.get('random_50');
+            uiconf.sections[0].content[3].value = self.config.get('random_100');
+            uiconf.sections[0].content[4].value = self.config.get('random_500');
+            uiconf.sections[0].content[5].value = self.config.get('latest');
+
+            defer.resolve(uiconf);
+        })
+        .fail(function()
+        {
+            defer.reject(new Error());
+        });
+
+    return defer.promise;
 };
 
 live_playlists.prototype.setUIConfig = function (data) {
@@ -390,4 +441,25 @@ live_playlists.prototype.getAdditionalConf = function () {
 live_playlists.prototype.setAdditionalConf = function () {
     var self = this;
     //Perform your tasks to set additional config data here
+};
+
+live_playlists.prototype.savePluginOptions = function (data) {
+    var self = this;
+
+    var defer = libQ.defer();
+
+    self.config.set('filter_path', data.filter_path);
+    self.config.set('random_10', data.random_10);
+    self.config.set('random_50', data.random_50);
+    self.config.set('random_100', data.random_100);
+    self.config.set('latest', data.latest);
+
+    self.logger.info('Live playlists configurations have been set');
+
+    self.commandRouter.pushToastMessage('success', 'Live Playlists', 'Configuration saved');
+
+    defer.resolve({});
+
+    return defer.promise;
+
 };
