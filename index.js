@@ -28,10 +28,8 @@ live_playlists.prototype.onVolumioStart = function () {
 
 live_playlists.prototype.onStart = function () {
     var self = this;
-    var defer = libQ.defer();
     self.addToBrowseSources();
-
-    return defer.promise;
+    return libQ.resolve();
 }
 
 live_playlists.prototype.handleBrowseUri = function (curUri) {
@@ -362,6 +360,7 @@ live_playlists.prototype.getTrackInfo = function(path){
 live_playlists.prototype.onStop = function () {
     var self = this;
     //Perform stop tasks here
+    return libQ.resolve();
 };
 
 live_playlists.prototype.onRestart = function () {
