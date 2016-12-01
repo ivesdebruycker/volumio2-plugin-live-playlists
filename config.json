@@ -3,21 +3,9 @@
     "type": "string",
     "value": ""
   },
-  "random_10":{
+  "random":{
     "type": "boolean",
     "value": true
-  },
-  "random_50":{
-    "type": "boolean",
-    "value": true
-  },
-  "random_100":{
-    "type": "boolean",
-    "value": true
-  },
-  "random_500":{
-    "type": "boolean",
-    "value": false
   },
   "latest":{
     "type": "boolean",

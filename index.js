@@ -2,6 +2,7 @@
 
 var libQ = require('kew');
 var libMpd = require('mpd');
+var moment = require('moment');
 
 module.exports = live_playlists;
 
@@ -29,6 +30,7 @@ live_playlists.prototype.onVolumioStart = function () {
 live_playlists.prototype.onStart = function () {
     var self = this;
     self.addToBrowseSources();
+
     return libQ.resolve();
 }
 
@@ -65,52 +67,107 @@ live_playlists.prototype.handleBrowseUri = function (curUri) {
         });*/
 
         if(curUri == 'live_playlists') {
-            if (self.config.get('random_10')) {
+            if (self.config.get('random')) {
                 list.push({
-                    type: 'playlist',
-                    title: '10 random tracks',
-                    service:'live_playlists',
-                    icon: 'fa fa-list-ol',
-                    uri: 'live_playlists_random_10'
-                });
-            }
-            if (self.config.get('random_50')) {
-                list.push({
-                    type: 'playlist',
-                    title: '50 random tracks',
-                    service:'live_playlists',
-                    icon: 'fa fa-list-ol',
-                    uri: 'live_playlists_random_50'
-                });
-            }
-            if (self.config.get('random_100')) {
-                list.push({
-                    type: 'playlist',
-                    title: '100 random tracks',
-                    service:'live_playlists',
-                    icon: 'fa fa-list-ol',
-                    uri: 'live_playlists_random_100'
-                });
-            }
-            if (self.config.get('random_500')) {
-                list.push({
-                    type: 'playlist',
-                    title: '500 random tracks',
-                    service:'live_playlists',
-                    icon: 'fa fa-list-ol',
-                    uri: 'live_playlists_random_500'
+                    service: 'live_playlists',
+                    type: 'folder',
+                    title: 'Random tracks',
+                    artist: '',
+                    album: '',
+                    icon: 'fa fa-folder-open-o',
+                    uri: 'live_playlists_random'
                 });
             }
             if (self.config.get('latest')) {
                 list.push({
-                    type: 'playlist',
-                    title: 'Latest tracks',
-                    service:'live_playlists',
-                    icon: 'fa fa-list-ol',
+                    service: 'live_playlists',
+                    type: 'folder',
+                    title: 'Recently added tracks',
+                    artist: '',
+                    album: '',
+                    icon: 'fa fa-folder-open-o',
                     uri: 'live_playlists_latest'
                 });
             }
             list.push({
+                service: 'live_playlists',
+                type: 'folder',
+                title: 'Tracks by decade',
+                artist: '',
+                album: '',
+                icon: 'fa fa-folder-open-o',
+                uri: 'live_playlists_decade'
+            });
+        } else if (curUri == 'live_playlists_random') {
+            response.navigation.prev.uri = "live_playlists";
+            list.push({
+                type: 'playlist',
+                title: '10 random tracks',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_random_10'
+            });
+            list.push({
+                type: 'playlist',
+                title: '50 random tracks',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_random_50'
+            });
+            list.push({
+                type: 'playlist',
+                title: '100 random tracks',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_random_100'
+            });
+            list.push({
+                type: 'playlist',
+                title: '500 random tracks',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_random_500'
+            });
+        } else if (curUri == 'live_playlists_latest') {
+            response.navigation.prev.uri = "live_playlists";
+            list.push({
+                type: 'playlist',
+                title: 'Tracks added in last week',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_latest_1_week'
+            });
+            list.push({
+                type: 'playlist',
+                title: 'Tracks added in last month',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_latest_1_month'
+            });
+            list.push({
+                type: 'playlist',
+                title: 'Tracks added in last 3 months',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_latest_3_months'
+            });
+            list.push({
+                type: 'playlist',
+                title: 'Tracks added in last 6 months',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_latest_6_months'
+            });
+            list.push({
+                type: 'playlist',
+                title: 'Tracks added in last year',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_latest_1_year'
+            });
+        } else if (curUri == 'live_playlists_decade') {
+            response.navigation.prev.uri = "live_playlists";
+            /*list.push({
                 type: 'playlist',
                 title: 'Tracks from 2015',
                 service:'live_playlists',
@@ -123,7 +180,7 @@ live_playlists.prototype.handleBrowseUri = function (curUri) {
                 service:'live_playlists',
                 icon: 'fa fa-list-ol',
                 uri: 'live_playlists_year_2016'
-            });
+            });*/
             list.push({
                 type: 'playlist',
                 title: 'Tracks from the 80s',
@@ -138,8 +195,23 @@ live_playlists.prototype.handleBrowseUri = function (curUri) {
                 icon: 'fa fa-list-ol',
                 uri: 'live_playlists_year_90s'
             });
-            defer.resolve(response);
+            list.push({
+                type: 'playlist',
+                title: 'Tracks from the 00s',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_year_00s'
+            });
+            list.push({
+                type: 'playlist',
+                title: 'Tracks from the 10s',
+                service:'live_playlists',
+                icon: 'fa fa-list-ol',
+                uri: 'live_playlists_year_10s'
+            });
         }
+
+        defer.resolve(response);
     }
     return defer.promise;
 }
@@ -184,14 +256,37 @@ live_playlists.prototype.explodeUri = function(uri) {
             case 'live_playlists_year_90s':
                 return self.findByYearRange(1990, 1999);
                 break;
+            case 'live_playlists_year_00s':
+                return self.findByYearRange(2000, 2009);
+                break;
+            case 'live_playlists_year_10s':
+                return self.findByYearRange(2010, 2019);
+                break;
             default:
                 return self.findByYear(2000);
                 break;
         }
     }
 
-    if (uri === 'live_playlists_latest') {
-        return self.findLastAdded();
+    if (uri.startsWith('live_playlists_latest_')) {
+        switch (uri) {
+            case 'live_playlists_latest_1_week':
+                return self.findLastAdded(1, 'weeks');
+                break;
+            case 'live_playlists_latest_1_month':
+                return self.findLastAdded(1, 'months');
+                break;
+            case 'live_playlists_latest_3_months':
+                return self.findLastAdded(3, 'months');
+                break;
+            case 'live_playlists_latest_6_months':
+                return self.findLastAdded(6, 'months');
+                break;
+            case 'live_playlists_latest_1_year':
+            default:
+                return self.findLastAdded(1, 'years');
+                break;
+        }
     }
 };
 
@@ -228,13 +323,13 @@ live_playlists.prototype.getRandom = function(count) {
     return defer.promise;
 };
 
-live_playlists.prototype.findLastAdded = function() {
+live_playlists.prototype.findLastAdded = function(num, timeUnit) {
     var filter_path = '';
     if (this.config.get('filter_path')) {
         filter_path = 'base "' + this.config.get('filter_path') + '"';
     }
 
-    return this.executeFind('modified-since "2016-06-01T00:00:00Z" ' + filter_path);
+    return this.executeFind('modified-since "' + moment().startOf('date').subtract(num, timeUnit).utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]') + '" ' + filter_path);
 };
 
 live_playlists.prototype.findByYear = function(year) {
@@ -390,12 +485,8 @@ live_playlists.prototype.getUIConfig = function() {
         .then(function(uiconf)
         {
             uiconf.sections[0].content[0].value = self.config.get('filter_path');
-            uiconf.sections[0].content[1].value = self.config.get('random_10');
-            uiconf.sections[0].content[2].value = self.config.get('random_50');
-            uiconf.sections[0].content[3].value = self.config.get('random_100');
-            uiconf.sections[0].content[4].value = self.config.get('random_500');
-            uiconf.sections[0].content[5].value = self.config.get('latest');
-
+            uiconf.sections[0].content[1].value = self.config.get('random');
+            uiconf.sections[0].content[2].value = self.config.get('latest');
             defer.resolve(uiconf);
         })
         .fail(function()
@@ -448,9 +539,7 @@ live_playlists.prototype.savePluginOptions = function (data) {
     var defer = libQ.defer();
 
     self.config.set('filter_path', data.filter_path);
-    self.config.set('random_10', data.random_10);
-    self.config.set('random_50', data.random_50);
-    self.config.set('random_100', data.random_100);
+    self.config.set('random', data.random);
     self.config.set('latest', data.latest);
 
     self.logger.info('Live playlists configurations have been set');

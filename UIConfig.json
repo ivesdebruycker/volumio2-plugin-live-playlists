@@ -6,17 +6,14 @@
    {
       "id": "section_random",
       "element": "section",
-      "label": "Random playlists",
+      "label": "Live playlists",
       "icon": "fa-list-ol",
       "onSave": {"type":"controller", "endpoint":"music_service/live_playlists", "method":"savePluginOptions"},
       "saveButton": {
         "label": "Save",
         "data": [
           "filter_path",
-          "random_10",
-          "random_50",
-          "random_100",
-          "random_500",
+          "random",
           "latest"
         ]
       },
@@ -30,31 +27,10 @@
           "value": ""
         },
         {
-          "id":"random_10",
+          "id":"random",
           "element": "switch",
-          "doc": "Playlist with 10 items",
-          "label": "10 items",
-          "value": true
-        },
-        {
-          "id":"random_50",
-          "element": "switch",
-          "doc": "Playlist with 50 items",
-          "label": "50 items",
-          "value": true
-        },
-        {
-          "id":"random_100",
-          "element": "switch",
-          "doc": "Playlist with 100 items",
-          "label": "100 items",
-          "value": true
-        },
-        {
-          "id":"random_500",
-          "element": "switch",
-          "doc": "Playlist with 500 items",
-          "label": "500 items",
+          "doc": "Playlists with random tracks",
+          "label": "Random",
           "value": true
         },
         {
