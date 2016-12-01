@@ -8,4 +8,4 @@ chown volumio:volumio /data/configuration/music_service/live_playlists/config.js
 echo "Install NodeJS dependencies"
 ( cd /data/plugins/music_service/live_playlists && npm install )
 
-echo "plugin install end"
+echo "plugininstallend"
