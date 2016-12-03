@@ -19,10 +19,11 @@ function live_playlists(context) {
 }
 
 live_playlists.prototype.onVolumioStart = function () {
-    var configFile = this.commandRouter.pluginManager.getConfigurationFile(this.context, 'config.json');
-
-    this.config = new (require('v-conf'))();
-    this.config.loadFile(configFile);
+    var self = this;
+    
+    self.config= new (require('v-conf'))();
+    var configFile=self.commandRouter.pluginManager.getConfigurationFile(self.context,'config.json');
+    self.config.loadFile(configFile);
 
     return libQ.resolve();
 };
@@ -550,4 +551,11 @@ live_playlists.prototype.savePluginOptions = function (data) {
 
     return defer.promise;
 
+};
+
+live_playlists.prototype.getConfigurationFiles = function()
+{
+	var self = this;
+
+	return ['config.json'];
 };
